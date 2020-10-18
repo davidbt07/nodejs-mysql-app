@@ -3,6 +3,11 @@ const morgan = require('morgan');
 const exphbs = require('express-handlebars');
 const path = require('path');
 
+const flash = require('connect-flash');
+const session = require('express-session');//Las sesiones almacenan los datos en una memoria del servidor, aunque también se pueden guardar en la BD
+const MySQLStore = require('express-mysql-session');
+const { database } = require('./keys');
+
 //Initialization
 const app = express();
 
@@ -18,12 +23,21 @@ app.engine('.hbs', exphbs({
 }));
 app.set('view engine', '.hbs');
 //Middlewares-Funciones que se ejecutan cuando un usuario envia una peticion al servidor
+app.use(session({
+    secret: 'yeimysqlnosesession',//Se puede cualquier mensaje
+    resave: false, //Para que no se empiece a renovar la sesion
+    saveUninitialized: false, //Para que no se vuelva a establecer la sesion
+    store: new MySQLStore(database)//Lugar donde se guardará la sesion, en este caso en la base de datos
+}));
+app.use(flash());
 app.use(morgan('dev'));
 app.use(express.urlencoded({extended: false}))//Aceptar desde formularios los datos que envie el usuario
 app.use(express.json());
 
+
 //Global variables
 app.use((req, res, next) => {
+    app.locals.success = req.flash('success');//Así se hace el mensaje success disponsible para todas las vistas
     next();
 });
 

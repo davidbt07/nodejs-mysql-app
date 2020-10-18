@@ -20,6 +20,8 @@ router.post('/add', async (req, res) => {
     //Sigue guardar esta info en la BD
     await pool.query('INSERT INTO links set ?', [newLink]);//El signo de interrogacion dice que va a pasar el dato luego, en este caso en un arreglo
     //await dice que la peticion va a tomar tiempo, entonces cuando termine va a seguir la siguiente linea, requiere que la funcion principal tenga "async"
+    //Usando flash
+    req.flash('success', 'Link saved succesfully');//Parametros(nombre como va a guardar el mensaje, valor del mensaje)
     res.redirect('/links');
 });
 //Manejar ruta links
@@ -35,6 +37,7 @@ router.get('/delete/:id', async(req, res) => {
     console.log(req.params.id);
     const { id } = req.params;
     await pool.query('DELETE FROM links WHERE id = ?', [id]);
+    req.flash('success', 'Links removed succesfully');
     res.redirect('/links');
 });
 
@@ -57,6 +60,7 @@ router.post('/edit/:id', async(req, res) => {
     };
     console.log(newLink);
     await pool.query('UPDATE links set ? WHERE id = ?',[newLink, id]);
+    req.flash('success', 'Links updated succesfully');
     res.redirect('/links');
 });
 module.exports = router;
