@@ -29,4 +29,12 @@ router.get('/', async (req, res) => {
     res.render('links/list', {links});
 
 });//Por el prefijo links queda /links
+
+//Ruta para eliminar
+router.get('/delete/:id', async(req, res) => {
+    console.log(req.params.id);
+    const { id } = req.params;
+    await pool.query('DELETE FROM links WHERE id = ?', [id]);
+    res.redirect('/links');
+});
 module.exports = router;
