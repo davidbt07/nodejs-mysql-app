@@ -8,8 +8,11 @@ const session = require('express-session');//Las sesiones almacenan los datos en
 const MySQLStore = require('express-mysql-session');
 const { database } = require('./keys');
 
+const passport = require('passport');//No para definir autenticaciones sino para usar sus metodos principales
+
 //Initialization
 const app = express();
+require('./lib/passport')
 
 //Settings
 app.set('port', process.env.PORT || 4000);
@@ -33,7 +36,8 @@ app.use(flash());
 app.use(morgan('dev'));
 app.use(express.urlencoded({extended: false}))//Aceptar desde formularios los datos que envie el usuario
 app.use(express.json());
-
+app.use(passport.initialize());//Así inicia
+app.use(passport.session());//Requiere una sesion para obtener los datos
 
 //Global variables
 app.use((req, res, next) => {
