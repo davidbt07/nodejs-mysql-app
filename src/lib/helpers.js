@@ -8,10 +8,10 @@ helpers.encryptPassword = async(password) => {//Se crea metodo para cifrar la co
     return hash;
 };
 
-helpers.matchPassword = async(pasword, savedPassword) => {//Metodo para comparar contraseñas al momenot de hacer login
+helpers.matchPassword = async(password, savedPassword) => {//Metodo para comparar contraseñas al momenot de hacer login
     try{
-        await bcrypt.compare(password, savedPassword);//compare recibe la contraseña enviada por el usuario con lo que ya tengo en la base de datos
-    }catch{
+        return  await bcrypt.compare(password, savedPassword);//compare recibe la contraseña enviada por el usuario con lo que ya tengo en la base de datos
+    }catch(e){
         console.log(e);
     }
 }; 

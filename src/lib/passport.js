@@ -6,7 +6,7 @@ const pool = require('../database');
 
 const helpers = require('../lib/helpers');
 
-passport.use('local.signup', new localStrategy({
+passport.use('local.signup', new localStrategy({//Gracias al use puedo definir mi autenticación o registro
     usernameField: 'username',//Voy a recibir un usernamefield a traves de un input con nombre "username"
     passwordField: "password",
     passReqToCallback: true //Necesario para recibir más campos a parte del username y la contraseña
@@ -21,7 +21,26 @@ passport.use('local.signup', new localStrategy({
     const result = await pool.query('INSERT INTO users SET ?', [newUser]);
     newUser.id= result.insertId;
     return done(null, newUser);
-}));//Gracias al use puedo definir mi autenticación
+}));
+
+passport.use('local.signin', new localStrategy({
+    usernameField: "username",
+    passwordField: "password",
+    passReqToCallback: true
+}, async(req, username, password, done) => {
+   const rows =  await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+    if(rows.length > 0){
+        const user = rows[0];
+        const validPassword = await helpers.matchPassword(password, user.password);
+        if (validPassword) {
+            done(null, user, req.flash('success','Welcome ' + user.username));
+        }else {
+            done(null, false, req.flash('message','Incorrect Password'));
+        }
+    }else {
+        return done(null, false, req.flash('message','The username does not exists'));
+    }
+}));
 
 //Middlewares para serializar y desserializar al usuario
 passport.serializeUser((user, done) => {

@@ -42,6 +42,7 @@ app.use(passport.session());//Requiere una sesion para obtener los datos
 //Global variables
 app.use((req, res, next) => {
     app.locals.success = req.flash('success');//Así se hace el mensaje success disponsible para todas las vistas
+    app.locals.message = req.flash('message');
     next();
 });
 
