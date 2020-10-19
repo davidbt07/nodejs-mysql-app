@@ -3,9 +3,11 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 
+const { isLoggedIn, isNotLoggedIn } = require('../lib/auth');
+
 //Para menar ruta signup
 //Para renderizar el formulario
-router.get('/signup', (req, res) => {
+router.get('/signup', isNotLoggedIn, (req, res) => {
     res.render('auth/signup');
 });
 
@@ -21,17 +23,17 @@ router.get('/signup', (req, res) => {
 });*/
 
 //Otra forma más sencilla es pasar la info a traves del enrutador
-router.post('/signup', passport.authenticate('local.signup', {
+router.post('/signup', isNotLoggedIn, passport.authenticate('local.signup', {
         successRedirect: '/profile',
         failureRedirect: '/signup', 
         failureFlash: true
 }));
 
-router.get('/signin', (req, res) => {
+router.get('/signin', isNotLoggedIn, (req, res) => {
     res.render('auth/signin');
 });
 
-router.post('/signin', (req, res, next) => {
+router.post('/signin', isNotLoggedIn, (req, res, next) => {
     passport.authenticate('local.signin', {
         successRedirect: '/profile',
         failureRedirect: '/signin', 
@@ -39,7 +41,12 @@ router.post('/signin', (req, res, next) => {
     })(req, res, next)
 });
 
-router.get('/profile', (req, res) => {
-    res.send('This is your profile');
+router.get('/profile', isLoggedIn, (req, res) => {//Al intentar obtener esa ruta se ejecuta primero isLoggedIn y luego la función anónima
+    res.render('profile');//Al no estar en ninguna carpeta se pone solo el nombre del archivo
+});
+
+router.get('/logout', isLoggedIn, (req, res) => {
+    req.logOut();//Es un metodo de passport
+    res.redirect('/signin');
 });
 module.exports = router;
